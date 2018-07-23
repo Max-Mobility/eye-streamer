@@ -1,0 +1,34 @@
+{
+  "name": "eye-streamer",
+  "version": "1.0.0",
+  "description": "Streamers and Receivers for eye tracking images and image info",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "GazeCaptureStreamer": "node src/streamers/mitGazeCaptureStreamer.js --port $npm_package_config_port --fps $npm_package_config_fps --directory $npm_package_config_MIT_Gaze_Directory"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Max-Mobility/eye-streamer.git"
+  },
+  "config": {
+    "port": "1337",
+    "fps": "1",
+    "MIT_Gaze_Directory": "data/GazeCapture"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Max-Mobility/eye-streamer/issues"
+  },
+  "homepage": "https://github.com/Max-Mobility/eye-streamer#readme",
+  "dependencies": {
+    "chokidar": "^2.0.4",
+    "minimist": "^1.2.0",
+    "socket.io": "^2.1.1",
+    "socket.io-client": "^2.1.1"
+  }
+}
