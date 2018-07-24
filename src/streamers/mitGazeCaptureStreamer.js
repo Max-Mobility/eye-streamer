@@ -1,9 +1,9 @@
 /**
 * Data streamer for a single trial from the MIT GazeCapture dataset
-*/
+**/
+"use strict"
 const log = console.log.bind(console);
 const minimist = require('minimist');
-const fs = require('fs');
 
 var args = minimist(process.argv.slice(2),{
     string: 'directory',
@@ -14,14 +14,45 @@ var args = minimist(process.argv.slice(2),{
     }
 })
 
-//const gazeParser = require('../utils/mitGazeCaptureParser');
+log('Reading in data')
+const dataParser = require('../utils/mitGazeCaptureParser')(args.directory);
+log('Done')
+
+
 var io = require('socket.io').listen(args.port);
 
-console.dir(args);
+log("File to read: %s", args.file)
+log("FPS: %f",args.fps)
 
-log('Listening on port ' + args.port);
-log('Directory: ', args.directory);
-log('FPS: ', args.fps);
+log('creating framesInfo packet')
+//createMITGazeCaptureFrames is a synchronous call. Perform at startup.
+var frameInfo = dataParser.createMITGazeCaptureFrames();
+log('done')
+
+io.on('connection', socket => {
+    
+    log('User Connected. Starting stream to user...')
+
+    socket.on('log', data => {
+        log(data)
+    })
+
+    var i = 0;
+    var frameStreamer = setInterval(function(){
+        log('sending frameInfo');
+        socket.emit('frameInfo', frameInfo[i])
+        i++
+        if(i >= frameInfo.length){
+            clearInterval(frameStreamer)
+            console.log('Finished Streaming!')
+        }
+    },1000/args.fps)
+
+    socket.on('disconnect', () => {
+        log('User Disconnected.');
+        clearInterval(frameStreamer);
+    })
+})
 
 
 
