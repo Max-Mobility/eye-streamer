@@ -29,8 +29,12 @@
   },
   "homepage": "https://github.com/Max-Mobility/eye-streamer#readme",
   "dependencies": {
+    "Q": "^1.0.0",
     "chokidar": "^2.0.4",
+    "jimp": "^0.2.28",
     "minimist": "^1.2.0",
+    "python-shell": "^0.5.0",
+    "q": "^1.5.1",
     "socket.io": "^2.1.1",
     "socket.io-client": "^2.1.1"
   }

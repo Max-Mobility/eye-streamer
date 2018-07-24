@@ -21,15 +21,15 @@ log('Done')
 
 var io = require('socket.io').listen(args.port);
 
-log("File to read: %s", args.file)
+log("Directory to read: %s", args.directory)
 log("FPS: %f",args.fps)
 
-log('creating framesInfo packet')
 //createMITGazeCaptureFrames is a synchronous call. Perform at startup.
+log('creating framesInfo packet')
 var frames = dataParser.createMITGazeCaptureFrames();
 log('done')
 
-log(frames[0].frameInfo.frame)
+log(frames[8].frameInfo.face)
 
 io.on('connection', socket => {
     

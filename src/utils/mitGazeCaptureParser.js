@@ -3,7 +3,7 @@
  */
 
 const fs = require('fs');
-//const imSeg = require('../utils/imageSegmenter')
+const imSeg = require('../utils/imageSegmenter')
 
 const filenames = {
     face: "appleFace.json",
@@ -40,12 +40,12 @@ module.exports = function(dir){
             }
             frame.frameInfo[field] = fieldData
         })
+
+        imSeg.getSegmentedImages(frame)
         return frame
     }
-
-
+    
     this.createMITGazeCaptureFrames = function(){
-
         return [...Array(data.info.TotalFrames).keys()].map(getFrame);
     }
 
