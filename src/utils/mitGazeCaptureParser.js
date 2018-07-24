@@ -3,6 +3,7 @@
  */
 
 const fs = require('fs');
+//const imSeg = require('../utils/imageSegmenter')
 
 const filenames = {
     face: "appleFace.json",
@@ -23,37 +24,23 @@ module.exports = function(dir){
     })
 
     const getFrame = function(i){
-        return {
-            face: {
-                H: data.face.H[i],
-                W: data.face.W[i],
-                X: data.face.X[i],
-                Y: data.face.Y[i],
-                IsValid: data.face.IsValid[i]
-            },
-            leftEye: {
-                H: data.leftEye.H[i],
-                W: data.leftEye.W[i],
-                X: data.leftEye.X[i],
-                Y: data.leftEye.Y[i],
-                IsValid: data.leftEye.IsValid[i]
-            },
-            rightEye: {
-                H: data.rightEye.H[i],
-                W: data.rightEye.W[i],
-                X: data.rightEye.X[i],
-                Y: data.rightEye.Y[i],
-                IsValid: data.rightEye.IsValid[i]
-            },
-            dotInfo: {
-                DotNum: data.dotInfo.DotNum[i],
-                XPts: data.dotInfo.XPts[i],
-                YPts: data.dotInfo.YPts[i],
-                XCam: data.dotInfo.XCam[i],
-                YCam: data.dotInfo.YCam[i],
-                Time: data.dotInfo.Time[i]
+        var frame = {}
+        frame.frameInfo = {}
+        Object.keys(filenames).map(field => {
+            var fieldData = {}
+            if(field == 'frames'){
+                fieldData = data[field][i]
+            } else {
+                Object.keys(data[field]).map(val => {
+                    fieldData[val] = data[field][val][i]
+                })
             }
-        }
+            if(field == 'frames'){
+                field = 'frame'
+            }
+            frame.frameInfo[field] = fieldData
+        })
+        return frame
     }
 
 

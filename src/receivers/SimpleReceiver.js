@@ -18,7 +18,7 @@ var socket = require('socket.io-client')('http://' + args.ip + ':' + args.port);
 socket.on("connect", function() {
     log('Connected!')
 
-    socket.on('frameInfo', data => {
+    socket.on('frame', data => {
         log(data)
     })
 

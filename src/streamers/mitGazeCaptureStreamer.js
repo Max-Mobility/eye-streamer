@@ -26,8 +26,10 @@ log("FPS: %f",args.fps)
 
 log('creating framesInfo packet')
 //createMITGazeCaptureFrames is a synchronous call. Perform at startup.
-var frameInfo = dataParser.createMITGazeCaptureFrames();
+var frames = dataParser.createMITGazeCaptureFrames();
 log('done')
+
+log(frames[0].frameInfo.frame)
 
 io.on('connection', socket => {
     
@@ -39,10 +41,10 @@ io.on('connection', socket => {
 
     var i = 0;
     var frameStreamer = setInterval(function(){
-        log('sending frameInfo');
-        socket.emit('frameInfo', frameInfo[i])
+        log('sending frames');
+        socket.emit('frame', frames[i])
         i++
-        if(i >= frameInfo.length){
+        if(i >= frames.length){
             clearInterval(frameStreamer)
             console.log('Finished Streaming!')
         }
