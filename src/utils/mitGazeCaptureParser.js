@@ -16,14 +16,14 @@ const filenames = {
     screen: "screen.json"
 }
 
-module.exports = function(dir){
+module.exports = (dir) => {
 
     var data = {}
     Object.keys(filenames).map(file => {
         data[file] = JSON.parse(fs.readFileSync(dir + '/' + filenames[file], 'utf8'));
     })
 
-    const getFrame = function(i){
+    const getFrame = async (i) => {
         var frame = {}
         frame.frameInfo = {}
         Object.keys(filenames).map(field => {
@@ -41,15 +41,15 @@ module.exports = function(dir){
             frame.frameInfo[field] = fieldData
         })
 
-        imSeg.getSegmentedImages(frame)
+        frame.Image = await imSeg.getSegmentedImages(frame)
         return frame
     }
     
-    this.createMITGazeCaptureFrames = function(){
-        return [...Array(data.info.TotalFrames).keys()].map(getFrame);
+    this.createMITGazeCaptureFrames = async () => {
+        return Promise.all([...Array(data.info.TotalFrames).keys()].map(getFrame));
     }
 
-    this.getInfo = function(file){
+    this.getInfo = (file) => {
         return data[file]
     }
     return this

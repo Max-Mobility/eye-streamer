@@ -8,7 +8,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "GazeCaptureStreamer": "node src/streamers/mitGazeCaptureStreamer.js --port $npm_package_config_port --fps $npm_package_config_fps --directory $npm_package_config_MIT_Gaze_Directory",
+    "GazeCaptureStreamer": "node --max-old-space-size=4096 src/streamers/mitGazeCaptureStreamer.js --port $npm_package_config_port --fps $npm_package_config_fps --directory $npm_package_config_MIT_Gaze_Directory",
     "SimpleReceiver": "node src/receivers/SimpleReceiver.js --ip $npm_package_config_ip --port $npm_package_config_port",
     "TestStreamer": "node test/SimpleReceiverStatistics.js --ip $npm_package_config_ip --port $npm_package_config_port"
   },

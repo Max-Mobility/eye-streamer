@@ -5,91 +5,98 @@
 
 //const PythonShell = require('python-shell');
 
-const Jimp = require("jimp");
+const Jimp = require("jimp"),
+      promisify = require('util').promisify;
 
-var getSegmentedImages = function(frame){
-    var image = {}
+Jimp.prototype.getBufferAsync = promisify(Jimp.prototype.getBuffer)
 
-    if(frame.frameInfo.faceGrid.IsValid){
-        var faceX = frame.frameInfo.face.X;
-        var faceY = frame.frameInfo.face.Y;
-        var faceW = frame.frameInfo.face.W;
-        var faceH = frame.frameInfo.face.H;
+let count = 0;
 
-        if(faceX < 0){
-            faceW = faceW + faceX
-            faceX = 0
+const getSegmentedImages = async (frame) => {
+    try{
+        let image = {}
+        if(frame.frameInfo.faceGrid.IsValid
+          && frame.frameInfo.leftEye.IsValid
+          && frame.frameInfo.rightEye.IsValid){
+            let faceX = frame.frameInfo.face.X;
+            let faceY = frame.frameInfo.face.Y;
+            let faceW = frame.frameInfo.face.W;
+            let faceH = frame.frameInfo.face.H;
+
+            let leftEyeX = frame.frameInfo.leftEye.X;
+            let leftEyeY = frame.frameInfo.leftEye.Y;
+            let leftEyeW = frame.frameInfo.leftEye.W;
+            let leftEyeH = frame.frameInfo.leftEye.H;
+
+            let rightEyeX = frame.frameInfo.rightEye.X;
+            let rightEyeY = frame.frameInfo.rightEye.Y;
+            let rightEyeW = frame.frameInfo.rightEye.W;
+            let rightEyeH = frame.frameInfo.rightEye.H;
+
+
+            if(faceX < 0){
+                faceW = faceW + faceX
+                faceX = 0
+            }
+            if(faceY < 0){
+                faceH = faceH + faceY
+                faceY = 0
+            }
+
+            if(leftEyeX < 0){
+                leftEyeW = leftEyeW + leftEyeX
+                leftEyeX = 0
+            }
+            if(leftEyeY < 0){
+                leftEyeH = leftEyeH + leftEyeY
+                leftEyeY = 0
+            }
+
+            if(rightEyeX < 0){
+                rightEyeW = rightEyeW + rightEyeX
+                rightEyeX = 0
+            }
+            if(rightEyeY < 0){
+                rightEyeH = rightEyeH + rightEyeY
+                rightEyeY = 0
+            }
+
+            const faceImg = await Jimp.read('data/GazeCapture/frames/' + frame.frameInfo.frame)
+            const leftEyeImg = faceImg.clone()
+            const rightEyeImg = faceImg.clone()
+            faceImg.crop(faceX, faceY, faceW, faceH).resize(224,224)
+            leftEyeImg.crop(leftEyeX, leftEyeY, leftEyeW, leftEyeH).resize(224,224)
+            rightEyeImg.crop(rightEyeX, rightEyeY, rightEyeW, rightEyeH).resize(224,224)
+            image.face =await new Promise((resolve, reject) => {
+                faceImg.getBuffer(Jimp.MIME_JPEG, (error, buff) => {
+                    return error ? reject(error) : resolve(buff)
+                })
+            })
+            image.leftEye =await new Promise((resolve, reject) => {
+                leftEyeImg.getBuffer(Jimp.MIME_JPEG, (error, buff) => {
+                    return error ? reject(error) : resolve(buff)
+                })
+            })
+            image.rightEye =await new Promise((resolve, reject) => {
+                rightEyeImg.getBuffer(Jimp.MIME_JPEG, (error, buff) => {
+                    return error ? reject(error) : resolve(buff)
+                })
+            })
+            console.log(++count)
+
+
+        } else{
+            console.log(++count)
+/*
+            console.log('FaceGrid', frame.frameInfo.faceGrid.IsValid)
+            console.log('leftEye', frame.frameInfo.leftEye.IsValid)
+            console.log('rightEye',frame.frameInfo.rightEye.IsValid)
+*/
         }
-        if(faceY < 0){
-            faceH = faceH + faceY
-            faceY = 0
-        }
-        
-        Jimp.read('data/GazeCapture/frames/' + frame.frameInfo.frame, (err, img) => {
-            console.log('Valid Frame Started')
-            if(err) throw err;
-            img.crop(faceX, faceY, faceW, faceH)
-            img.resize(224,224)
-            console.log(Object.keys(img))
-            console.log('Valid Frame Complete');
-        })
-    } else{
-        console.log('Invalid Frame')
-    }
+        //console.log(image)
         return image
-
-
-    /*    console.log('In ImSeg')
-
-     
-     var options = {
-     mode: 'text',
-     scriptPath: 'src/utils',
-     args: [frame.frameInfo.face.X,
-     frame.frameInfo.face.Y,
-     frame.frameInfo.face.W,
-     frame.frameInfo.face.H,
-     frame.frameInfo.leftEye.X,
-     frame.frameInfo.leftEye.Y,
-     frame.frameInfo.leftEye.W,
-     frame.frameInfo.leftEye.H,
-     frame.frameInfo.rightEye.X,
-     frame.frameInfo.rightEye.Y,
-     frame.frameInfo.rightEye.W,
-     frame.frameInfo.rightEye.H,
-     '../../data/GazeCapture/frames/' + frame.frameInfo.frame
-     ]
-     }
-
-     console.log('running python script...')
-     PythonShell.run('imageSegmenter.py', options, (err, results) => {
-     if(err) throw err;
-     console.log('results: %j', results);
-     })
-     console.log('script completed')
-
-     const pythonProcess = spawn('python', ["../utils/imageSegmenter.py", 
-     frame.frameInfo.face.X,
-     frame.frameInfo.face.Y,
-     frame.frameInfo.face.W,
-     frame.frameInfo.face.H,
-     frame.frameInfo.leftEye.X,
-     frame.frameInfo.leftEye.Y,
-     frame.frameInfo.leftEye.W,
-     frame.frameInfo.leftEye.H,
-     frame.frameInfo.rightEye.X,
-     frame.frameInfo.rightEye.Y,
-     frame.frameInfo.rightEye.W,
-     frame.frameInfo.rightEye.H,
-     '../../data/GazeCapture/frames/' + frame.frameInfo.frame
-     ]
-     )
-     pythonProcess.stdout.on('data', (data) => {
-     console.log('Python Output:',data)
-     })
-     pythonProcess.stderr.on('data', (data) => {
-     console.log('Python Error: ', data)
-     })*/
+    } catch (err) {
+        console.log(err)
+    }
 }
-
 exports.getSegmentedImages = getSegmentedImages

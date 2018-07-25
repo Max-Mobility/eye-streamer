@@ -19,7 +19,7 @@ socket.on("connect", function() {
     log('Connected!')
 
     socket.on('frame', data => {
-        log(data)
+        log(JSON.parse(data))
     })
 
     socket.on("disconnect", function(){
