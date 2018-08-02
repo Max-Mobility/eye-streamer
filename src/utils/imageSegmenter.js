@@ -3,7 +3,6 @@
  * Wrapper for pythong/opencv that does the heavy lifting
  **/
 
-//const PythonShell = require('python-shell');
 
 const Jimp = require("jimp"),
       promisify = require('util').promisify;
@@ -65,8 +64,8 @@ const getSegmentedImages = async (frame) => {
             const leftEyeImg = faceImg.clone()
             const rightEyeImg = faceImg.clone()
             faceImg.crop(faceX, faceY, faceW, faceH).resize(224,224)
-            leftEyeImg.crop(leftEyeX, leftEyeY, leftEyeW, leftEyeH).resize(224,224)
-            rightEyeImg.crop(rightEyeX, rightEyeY, rightEyeW, rightEyeH).resize(224,224)
+            leftEyeImg.crop(leftEyeX + faceX, leftEyeY + faceY, leftEyeW, leftEyeH).resize(224,224)
+            rightEyeImg.crop(rightEyeX + faceX, rightEyeY + faceY, rightEyeW, rightEyeH).resize(224,224)
             image.face =await new Promise((resolve, reject) => {
                 faceImg.getBuffer(Jimp.MIME_JPEG, (error, buff) => {
                     return error ? reject(error) : resolve(buff)
@@ -87,13 +86,7 @@ const getSegmentedImages = async (frame) => {
 
         } else{
             console.log(++count)
-/*
-            console.log('FaceGrid', frame.frameInfo.faceGrid.IsValid)
-            console.log('leftEye', frame.frameInfo.leftEye.IsValid)
-            console.log('rightEye',frame.frameInfo.rightEye.IsValid)
-*/
         }
-        //console.log(image)
         return image
     } catch (err) {
         console.log(err)
