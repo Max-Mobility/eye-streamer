@@ -17,7 +17,6 @@ io.on("connection", function(socket) {
     log('User Connected!')
 
     socket.on('log', data => {
-		log(data.length)
         log(data)
     })
 
